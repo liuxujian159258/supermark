@@ -1,5 +1,16 @@
 module.exports = {
+  configureWebpack: {
+    resolve: {
+      alias: {
+        assets: '@/assets',
+        common: '@/common',
+        components: '@/components',
+        network: '@/network',
+        views: '@/views'
+      }
+    }
+  },
   devServer: {
-    port: 8081 // 端口号
+    port: 8082 // 端口号
   }
 }
