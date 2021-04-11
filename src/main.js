@@ -17,6 +17,7 @@ axios.interceptors.request.use(config => {
 Vue.prototype.$store = store
 Vue.prototype.$http = axios
 Vue.prototype.qs = qs
+Vue.prototype.$bus = new Vue()
 new Vue({
   router,
   render: h => h(App)

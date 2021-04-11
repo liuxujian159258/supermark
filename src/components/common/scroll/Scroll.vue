@@ -33,23 +33,34 @@ export default {
       probeType: this.probetype,
       pullUpLoad: this.pullupload
     })
-    this.scroll.on('scroll', (position) => {
-      // console.log(position)
-      this.$emit('scroll', position)
-    })
-    // 监听上拉事件
-    this.scroll.on('pullingUp', () => {
-      // console.log('上拉加载更多')
-      this.$emit('pullingUp')
-      // 发送网络请求，展示新的数据
-    })
+    if (this.probetype === 2 || this.probetype === 3) {
+      this.scroll.on('scroll', (position) => {
+        // console.log(position)
+        this.$emit('scroll', position)
+      })
+    }
+    if (this.pullupload) {
+      // 监听上拉事件
+      this.scroll.on('pullingUp', () => {
+        // console.log('上拉加载更多')
+        this.$emit('pullingUp')
+        // 发送网络请求，展示新的数据
+      })
+    }
   },
   methods: {
     scrollTo (x, y, time = 300) {
-      this.scroll.scrollTo(x, y, time)
+      this.scroll && this.scroll.scrollTo(x, y, time)
     },
     finishPullUp () {
-      this.scroll.finishPullUp()
+      this.scroll && this.scroll.finishPullUp()
+    },
+    refresh () {
+      this.scroll && this.scroll.refresh()
+      // console.log('下拉加载')
+    },
+    getScrollY () {
+      return this.scroll ? this.scroll.y : 0
     }
   }
 }
