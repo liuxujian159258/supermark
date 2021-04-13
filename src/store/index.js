@@ -11,6 +11,8 @@ Vue.use(Vuex)
 // 创建对象
 const store = new Vuex.Store({
   state: {
+    // 购物车对象
+    cartList: [],
     counter: 1000,
     studnets: [
       { id: 110, name: 'why', age: 18 },

@@ -5,7 +5,10 @@ import axios from 'axios'
 import './plugins/element.js'
 import qs from 'qs'
 import store from './store'
+// eslint-disable-next-line no-unused-vars
 import { request } from './network/request'
+import FastClick from 'fastclick'
+import VueLazyload from 'vue-lazyload'
 
 // axios.defaults.baseURL = 'https://appservice.lzu.edu.cn/api/eusp-unify-terminal/app-user/login'
 // 在请求中添加token
@@ -14,10 +17,15 @@ axios.interceptors.request.use(config => {
   return config
 })
 // axios.defaults.headers.post['Content-Type'] = 'application/json'
+Vue.config.productionTip = false
 Vue.prototype.$store = store
 Vue.prototype.$http = axios
 Vue.prototype.qs = qs
 Vue.prototype.$bus = new Vue()
+Vue.use(VueLazyload, {
+  loading: require('./assets/img/common/placeholder.png')
+})
+FastClick.attach(document.body)
 new Vue({
   router,
   render: h => h(App)
@@ -72,10 +80,10 @@ new Vue({
 // }).then(res => {
 //   console.log(res)
 // })
-request({
-  url: '/home/multidata'
-}).then(res => {
-  console.log(res)
-}).catch(err => {
-  console.log(err)
-})
+// request({
+//   url: '/home/multidata'
+// }).then(res => {
+//   console.log(res)
+// }).catch(err => {
+//   console.log(err)
+// })

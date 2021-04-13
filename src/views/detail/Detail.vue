@@ -1,9 +1,11 @@
 <template>
    <div id="detail">
-     <DetailBavBar class="detail-nav" @titleClick="titleClick"/>
+     <DetailBavBar class="detail-nav" @titleClick="titleClick" ref="nav"/>
      <scroll
        class="detail-content"
        ref="scroll"
+       :probetype="3"
+       @scroll="contentScroll"
        @pullingUp="loadMore">
        <DetailSwiper :topimages="topImages"/>
        <DetailBaseInfo :goods="goods"/>
@@ -13,6 +15,9 @@
        <DetailCommentInfo ref="comment" :commentInfo="commentInfo"/>
        <GoodsList ref="recommend" :goods="recommends"></GoodsList>
      </scroll>
+     <DetailBottomBar @addToCart="addToCart"/>
+     <BackTop @click.native="backClick" v-show="isShowBackTop"/>
+     <Toast :message="message" :show="show"/>
    </div>
 </template>
 
@@ -24,10 +29,13 @@ import DetailShopInfo from './childComps/DetailShopInfo'
 import DetailGoodsInfo from './childComps/DetailGoodsInfo'
 import DetailParamInfo from './childComps/DetailParamInfo'
 import DetailCommentInfo from './childComps/DetailCommentInfo'
+import DetailBottomBar from './childComps/DetailBottomBar'
+import Toast from '../../components/common/toast/Toast'
 
 import Scroll from 'components/common/scroll/Scroll'
 
 import GoodsList from 'components/content/goods/GoodsList'
+import BackTop from 'components/content/backTop/BackTop'
 
 import { getDetail, getRecommend, Goods, Shop, GoodsParams } from 'network/detail'
 import { debounce } from '../../util/debounce'
@@ -44,7 +52,10 @@ export default {
     DetailGoodsInfo,
     DetailParamInfo,
     DetailCommentInfo,
-    GoodsList
+    GoodsList,
+    DetailBottomBar,
+    BackTop,
+    Toast
   },
   mixins: [itemListenerMixin],
   mounted () {
@@ -72,7 +83,11 @@ export default {
       commentInfo: {},
       recommends: [],
       themeTopYs: [],
-      themeTopY: null
+      themeTopY: null,
+      currentIndex: 0,
+      isShowBackTop: false,
+      message: '',
+      show: false
     }
   },
   created () {
@@ -125,7 +140,50 @@ export default {
         this.themeTopYs.push(this.$refs.params.$el.offsetTop)
         this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
         this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+        this.themeTopYs.push(Number.MAX_VALUE)
       }, 100)
+    },
+    contentScroll (position) {
+      // BackTop是否显示
+      this.isShowBackTop = (-position.y) > 1000
+      const positionY = -position.y + 44
+      // console.log(position)
+      const length = this.themeTopYs.length
+      for (let i = 0; i < length - 1; i++) {
+        if (this.currentIndex !== i && (positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i + 1])) {
+          this.currentIndex = i
+          // console.log(this.currentIndex)
+          this.$refs.nav.currentIndex = this.currentIndex
+        }
+      }
+      // for (let i = 0; i < length; i++) {
+      //   if (this.currentIndex !== i && ((i < length - 1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i + 1]) ||
+      //     (i === length - 1 && positionY >= this.themeTopYs[i]))) {
+      //     this.currentIndex = i
+      //     // console.log(this.currentIndex)
+      //     this.$refs.nav.currentIndex = this.currentIndex
+      //   }
+      // }
+    },
+    backClick () {
+      this.$refs.scroll.scrollTo(0, 0)
+    },
+    addToCart () {
+      const product = {}
+      product.image = this.topImages[0]
+      product.title = this.goods.title
+      product.desc = this.goods.desc
+      product.price = this.goods.realPrice
+      product.iid = this.id
+
+      // 加入购物车
+      this.$store.commit('addCart', product)
+      this.show = true
+      this.message = '购物车加入成功'
+      setTimeout(() => {
+        this.show = false
+        this.message = ''
+      }, 1500)
     }
   }
 }
